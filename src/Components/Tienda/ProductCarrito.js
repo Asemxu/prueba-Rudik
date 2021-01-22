@@ -12,8 +12,8 @@ export default class ProductCarrito extends React.Component{
             <React.Fragment>
                 <img src={this.state.product.image} alt={this.state.product.name}/>
                 <div className="desc">
-                    <h6>{this.state.product.name}</h6>
-                    <h6>Total: {this.state.product.price.amount}</h6>
+                    <h6>{this.state.product.cantidad}X {this.state.product.name}</h6>
+                    <h6>Total: {(this.state.product.price.amount * this.state.product.cantidad).toFixed(2)}</h6>
                 </div>
                 <div className="delete_product" onClick={this.props.deleteProduct} data={this.state.product.id}>
                     x

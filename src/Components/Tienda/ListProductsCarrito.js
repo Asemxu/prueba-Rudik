@@ -7,7 +7,7 @@ export default class ListProductsCarrito extends React.Component{
             <React.Fragment>
                 <ul className="lista_products_carrito">
                     {this.props.products.map((product) => {
-                        let price = parseFloat(product.price.amount);
+                        let price = parseFloat(product.price.amount) * product.cantidad; 
                         total+=price;
                         return(
                             <li key={product.id}>
@@ -20,7 +20,7 @@ export default class ListProductsCarrito extends React.Component{
                         )
                     })}
                     <hr/>
-                    <div clasName="total_costo">
+                    <div className="total_costo">
                         <h2>Total : {total.toFixed(2)}</h2>
                     </div>
                 </ul>

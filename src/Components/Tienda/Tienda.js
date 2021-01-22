@@ -4,13 +4,16 @@ import data from '../../Database/products.json';
 import ListProducts from './ListProducts';
 import imgCart from '../../images/add.svg';
 import ListProductsCarrito from './ListProductsCarrito';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export default class Tienda extends React.Component{
     constructor(props){
         super(props);
         this.state = {
             productos:data.products,
-            myProducts:[],
-            openCarrito: false
+            myProducts: JSON.parse(localStorage.getItem('myProducts')) || [],
+            openCarrito: false,
+            lastProductSelected:null
         }
     }
 
@@ -27,8 +30,34 @@ export default class Tienda extends React.Component{
 
     addCart = (data) =>{
         let products = this.state.myProducts;
-        products.push(data);
-      this.setState({myProducts:products});
+        if(data.cantidad === undefined){
+            data.cantidad = 1;
+            this.setState({lastProductSelected:data});
+            products.push(data);
+            localStorage.setItem('myProducts',JSON.stringify(products));
+        }else{
+            if(this.state.lastProductSelected.id === data.id){
+                for(let i = 0 ;i < this.state.myProducts.length; i++){
+                    if(this.state.myProducts[i].id === data.id){
+                        data.cantidad++;
+                        products[i] = data;
+                        break;
+                    }
+                }
+            }
+            
+        }
+        
+        this.setState({myProducts:products});
+        toast.success('🛍 Añadido al Carrito de Compras!' , {
+            position: "bottom-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
     }
 
     hideCarrito = (carrito_container,close,lista_productos_carrito) =>{
@@ -48,7 +77,28 @@ export default class Tienda extends React.Component{
     deleteMyProduct  = e =>{
         let id = e.target.getAttribute('data');
         id = parseInt(id);
+        let productos = this.state.productos;
         let newProducts = this.state.myProducts.filter(item => item.id !== id);
+        for(let i = 0 ;i < productos.length; i++){
+            if(productos[i].id === id){
+                // productos[i].cantidad = undefined;
+                delete productos[i]['cantidad'];
+                delete productos.cantidad;
+                break;
+            }
+        }
+        if(this.state.lastProductSelected !== null){
+            if(this.state.lastProductSelected.id === id){
+                this.setState({
+                    lastProductSelected :{
+                        ...this.state.lastProductSelected,
+                        cantidad : 0
+                    }
+                })
+
+            }
+        }
+
         this.setState({myProducts:newProducts});
     }
     render(){
@@ -71,6 +121,17 @@ export default class Tienda extends React.Component{
                 <div className="carrito_img">
                     <img src={imgCart} onClick={this.hideorShow} alt="imagen del carrito de Compras"/>
                 </div>
+                <ToastContainer
+                    position="bottom-center"
+                    autoClose={3000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                />
             </React.Fragment>
             
         )
